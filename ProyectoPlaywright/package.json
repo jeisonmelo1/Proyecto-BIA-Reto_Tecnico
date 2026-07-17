@@ -6,8 +6,8 @@
   "scripts": {
     "prepare": "npx playwright install",
     "test": "npm run test:cucumber",
-    "test:cucumber": "cucumber-js --require-module ts-node/register --require tests/cucumber/**/*.ts tests/features/**/*.feature",
-    "test:coverage": "c8 --reporter=lcov --reporter=text --report-dir=coverage cucumber-js --require-module ts-node/register --require tests/cucumber/**/*.ts tests/features/**/*.feature",
+    "test:cucumber": "cucumber-js",
+    "test:coverage": "c8 --reporter=lcov --reporter=text --report-dir=coverage cucumber-js",
     "sonar": "npm run test:coverage && sonar-scanner"
   },
   "repository": {

@@ -21,6 +21,7 @@ class CustomWorld {
 
   async init() {
     this.browser = await chromium.launch({
+      channel: 'chrome',
       headless: process.env.HEADLESS?.toLowerCase() !== 'false',
     });
     this.page = await this.browser.newPage();
