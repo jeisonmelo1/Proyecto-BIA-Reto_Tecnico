@@ -66,3 +66,36 @@ Los casos detallados están en `03-casos-caja-negra.md`, `04-caja-blanca.md` y `
 - Informe final con riesgos residuales, limitaciones y defectos conocidos.
 
 Si no se cumple un criterio, la versión no se libera hasta corregirlo o aprobar formalmente la excepción.
+
+## Decisión de liberación: la versión actual no debe salir a producción
+
+Con los defectos abiertos registrados en `05-defectos.md`, la versión evaluada **no cumple los criterios de salida** y la recomendación es **no liberarla** (no-go) hasta corregir los defectos bloqueantes o aprobar por escrito una excepción.
+
+### Defectos que bloquean la liberación
+
+| Defecto | Severidad | Riesgo del plan | Por qué impide la salida | Test automatizado |
+|---|---|---|---|---|
+| **DEF-01** · `getAll` devuelve 500 con `page` negativo o desbordado | Alta | P2 (paginación) | Incumple el criterio «sin defectos de severidad alta abiertos». Cualquier cliente autenticado dispara un error interno no controlado que además expone un fallo del servidor. | `CB-10 · page=-1 … (DEF-01)` en `e2e/tests/api/meters.api.spec.ts` |
+| **DEF-05** · «Siguiente» siempre deshabilitado | Media | P3 (paginación) | Con 12 medidores y 10 por página, un usuario normal nunca ve los 2 últimos; solo se alcanzan editando la URL (`?pagina=2`). Es pérdida de visibilidad de datos operativos. | `CB-12 · «Siguiente» está habilitado … (DEF-05)` en `e2e/tests/ui/meters.spec.ts` |
+| **DEF-02** · El filtro `meter_id` distingue mayúsculas | Media | P3 (búsqueda) | Contradice lo documentado: el operador que escribe `m-109` no encuentra un medidor existente y puede concluir que no existe. | `CB-15 · buscar «m-109» … (DEF-02)` en `e2e/tests/ui/meters.spec.ts` |
+
+### Defectos aceptables con plan
+
+| Defecto | Severidad | Motivo | Test automatizado |
+|---|---|---|---|
+| **DEF-03** · La paginación acepta `size=0` y `page=0` | Baja | Contrato ambiguo sin pérdida de datos. | `CB-10 · size=0 … (DEF-03)` en `e2e/tests/api/meters.api.spec.ts` |
+| **DEF-04** · Login con email sin formato devuelve 401 | Baja | Afecta solo la experiencia; el mensaje genérico es deseable por seguridad. | Sin automatizar |
+
+### Criterios de salida incumplidos
+
+- **Sin defectos de severidad alta abiertos:** incumplido por DEF-01.
+- **Fallos P2 resueltos o aceptados por escrito:** DEF-05 y DEF-02 están abiertos y no tienen excepción aprobada.
+- **Resultados reproducibles e informados por capa:** falta una ejecución completa en verde en los cinco navegadores (chromium, firefox, webkit, chrome y edge); no se ha confirmado que no existan pruebas intermitentes.
+
+### Condiciones para liberar
+
+1. Corregir DEF-01, DEF-05 y DEF-02, o que el responsable de producto apruebe por escrito su aceptación con fecha de corrección.
+2. Obtener una ejecución completa en verde del workflow `E2E · Pruebas automatizadas` en los cinco navegadores, sin pruebas intermitentes (`failOnFlakyTests` activo en CI).
+3. Registrar DEF-03 y DEF-04 como deuda conocida en el informe final.
+
+Los tests de defectos fallan mientras el defecto exista y hacen fallar el pipeline; pasan cuando se corrija, lo que sirve como verificación automática de cada corrección.

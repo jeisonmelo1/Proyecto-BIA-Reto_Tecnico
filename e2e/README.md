@@ -7,11 +7,15 @@ Pruebas automatizadas de **EnergIA** (UI y API) con **Playwright Test** y el pat
 ## Estructura
 
 ```
+.github/workflows/e2e.yml     # pipeline de CI (GitHub Actions)
+qa/                           # plan y documentación de QA
 e2e/
 ├── package.json
 ├── playwright.config.ts      # proyecto `setup` + proyectos de navegador, reportes, evidencias
 ├── tsconfig.json
-├── .env.example              # plantilla de variables (el .env real no se versiona)
+├── .nvmrc                    # versión de Node usada también en CI
+├── .vscode/launch.json       # configuración de debug
+├── .env                      # variables locales (lo creas tú; no se versiona)
 ├── playwright/.auth/         # sesión guardada por `setup` (storageState, no se versiona)
 └── tests/
     ├── config/env.ts         # lectura de variables de entorno
@@ -70,25 +74,32 @@ Trazados a `../qa/03-casos-caja-negra.md`:
 Los tests con una referencia `DEF-xx` en el título cubren un **defecto conocido**: fallan mientras el defecto exista (y hacen fallar el workflow) y pasan cuando se corrija.
 
 
-## Requisitos previos
+## Ejecución local
 
-- Node.js 18 o superior.
+### Requisitos previos
+
+- Node.js 18 o superior (CI usa la versión de `.nvmrc`).
 - EnergIA en ejecución: UI en `http://localhost:5173` y API en `http://localhost:8080`.
-- Desde `e2e/`:
-  ```bash
-  npm install
-  npx playwright install
-  ```
-- Crear `.env` a partir de `.env.example` y completar las credenciales de la cuenta de pruebas. `.env` está ignorado por git; no versionar credenciales.
-  ```
-  HEADLESS=true
-  BASE_URL=http://localhost:5173
-  API_URL=http://localhost:8080/api/v1
-  ADMIN_EMAIL=
-  ADMIN_PASSWORD=
-  ```
 
-## Ejecución
+### Pasos
+
+1. Instalar dependencias y navegadores desde `e2e/`:
+   ```bash
+   npm ci
+   npx playwright install
+   ```
+2. Crear el archivo `e2e/.env` con las credenciales de la cuenta de pruebas. Está ignorado por git; no versionar credenciales.
+   ```
+   HEADLESS=true
+   BASE_URL=http://localhost:5173
+   API_URL=http://localhost:8080/api/v1
+   ADMIN_EMAIL=
+   ADMIN_PASSWORD=
+   ```
+3. Verificar tipos: `npm run typecheck`.
+4. Ejecutar las pruebas (ver comandos abajo) y abrir el reporte con `npm run report`.
+
+### Comandos
 
 ```bash
 npm test                 # todo, en todos los navegadores
@@ -108,6 +119,39 @@ npm run report           # abrir el reporte HTML
 ### Evidencias
 
 Se guardan captura y video solo cuando un test falla (`test-results/`), traza en el primer reintento y el reporte HTML en `playwright-report/`.
+
+## Ejecución en CI (GitHub Actions)
+
+El workflow [`.github/workflows/e2e.yml`](../.github/workflows/e2e.yml) corre en cada `push` a `main`, en cada `pull_request`, manualmente (`workflow_dispatch`, con el parámetro `app_ref`) y de lunes a viernes a las 06:00 (hora de Colombia).
+
+### Configuración previa
+
+En **Settings → Secrets and variables → Actions** crear los secretos `ADMIN_EMAIL` y `ADMIN_PASSWORD`. Sin ellos el job falla en «Validar secretos».
+
+### Qué hace
+
+1. **Typecheck:** `npm ci` y `npm run typecheck`.
+2. **E2E (matriz de 5 navegadores:** chromium, firefox, webkit, chrome y edge**):**
+   1. Descarga EnergIA (`biaenergy/prueba-qa`, rama `app_ref`, por defecto `main`) y la levanta con `docker compose up -d --build` (UI en `:3000`, API en `:8080`).
+   2. Espera a que respondan la UI y `/docs`.
+   3. Instala dependencias y el navegador, y ejecuta `npx playwright test --project=<navegador>`.
+   4. Sube evidencias y apaga la aplicación (`docker compose down -v`).
+
+### Reglas de resultado
+
+- En CI hay 2 reintentos por test y `failOnFlakyTests` está activo: un test que solo pasa tras reintentar **hace fallar** el job.
+- Los tests de defectos conocidos (`DEF-xx`) fallan mientras el defecto exista, por lo que el workflow queda en rojo hasta corregirlos.
+
+### Evidencias
+
+Se publican como artefactos de la ejecución (pestaña **Actions → ejecución → Artifacts**, retención de 14 días):
+
+| Artefacto | Contenido | Cuándo |
+|---|---|---|
+| `playwright-report-<navegador>` | Reporte HTML | Siempre (salvo cancelación) |
+| `test-results-<navegador>` | Trazas, capturas y videos | Solo si el job falla |
+
+Para ver un reporte descargado: descomprimirlo y ejecutar `npx playwright show-report <carpeta>`.
 
 ## Debug
 
