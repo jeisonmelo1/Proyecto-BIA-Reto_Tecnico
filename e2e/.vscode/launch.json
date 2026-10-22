@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug: archivo de prueba actual (chromium, con navegador)",
+            "runtimeExecutable": "npx",
+            "runtimeArgs": ["playwright", "test", "${relativeFile}", "--project=chromium", "--debug"],
+            "cwd": "${workspaceFolder}/e2e",
+            "env": {
+                "HEADLESS": "false"
+            },
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"]
+        }
+    ]
+}

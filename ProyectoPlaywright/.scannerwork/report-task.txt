@@ -1,6 +1,0 @@
-projectKey=proyecto-playwright
-serverUrl=http://localhost:9000
-serverVersion=26.7.0.124771
-dashboardUrl=http://localhost:9000/dashboard?id=proyecto-playwright
-ceTaskId=22e8744e-e936-4ab2-85ed-1189102cb3f3
-ceTaskUrl=http://localhost:9000/api/ce/task?id=22e8744e-e936-4ab2-85ed-1189102cb3f3
