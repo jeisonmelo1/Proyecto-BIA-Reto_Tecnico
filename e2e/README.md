@@ -67,7 +67,7 @@ Trazados a `../qa/03-casos-caja-negra.md`:
 | `tests/api/meters.api.spec.ts` | CB-09, CB-10 (DEF-01, DEF-03), CB-11, CB-13, CB-17, CB-18 |
 | `tests/api/anomalies.api.spec.ts` | CB-19 (tabla de decisión), CB-20, CB-22 |
 
-Los tests marcados con `test.fail` documentan un **defecto conocido**: pasan mientras el defecto exista y fallan («Expected to fail, but passed») cuando se corrija, para que se retire la marca.
+Los tests con una referencia `DEF-xx` en el título cubren un **defecto conocido**: fallan mientras el defecto exista (y hacen fallar el workflow) y pasan cuando se corrija.
 
 
 ## Requisitos previos

@@ -60,7 +60,7 @@ test.describe('Libro de medidores (UI)', () => {
   });
 
   // Defecto conocido DEF-05: en la primera página «Siguiente» queda deshabilitado aunque hay más resultados.
-  test.fail('CB-12 · «Siguiente» está habilitado en la página 1 de 2 (DEF-05)', async ({ metersPage }) => {
+  test('CB-12 · «Siguiente» está habilitado en la página 1 de 2 (DEF-05)', async ({ metersPage }) => {
     await expect(metersPage.nextPageButton).toBeEnabled({ timeout: 3000 });
   });
 
@@ -94,7 +94,7 @@ test.describe('Libro de medidores (UI)', () => {
   });
 
   // Defecto conocido DEF-02: la búsqueda no ignora mayúsculas pese a lo documentado.
-  test.fail('CB-15 · buscar «m-109» en minúsculas debe encontrar M-109 (DEF-02)', async ({ metersPage }) => {
+  test('CB-15 · buscar «m-109» en minúsculas debe encontrar M-109 (DEF-02)', async ({ metersPage }) => {
     await metersPage.search(SEARCH_TERMS.lowercase);
 
     await expect(metersPage.meterLinks).toHaveText(['M-109']);

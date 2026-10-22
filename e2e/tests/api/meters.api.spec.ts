@@ -52,12 +52,12 @@ test.describe('Medidores (API)', () => {
     expect((await getMeterById(authApi, UNKNOWN_METER_ID)).status()).toBe(404);
   });
 
-  test.fail('CB-10 · page=-1 debe validarse con 400 y no con 500 (DEF-01)', async ({ authApi }) => {
+  test('CB-10 · page=-1 debe validarse con 400 y no con 500 (DEF-01)', async ({ authApi }) => {
     const response = await getAllMeters(authApi, { pagination: { page: -1, size: 10 } });
     expect(response.status()).toBe(400);
   });
 
-  test.fail('CB-10 · size=0 debe rechazarse con 400 (DEF-03)', async ({ authApi }) => {
+  test('CB-10 · size=0 debe rechazarse con 400 (DEF-03)', async ({ authApi }) => {
     const response = await getAllMeters(authApi, { pagination: { page: 1, size: 0 } });
     expect(response.status()).toBe(400);
   });
