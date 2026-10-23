@@ -2,6 +2,8 @@
 
 ## Descripción
 
+## Enlace del vídeo: https://www.youtube.com/watch?v=yDA9zope6_U
+
 Pruebas automatizadas de **EnergIA** (UI y API) con **Playwright Test** y el patrón **Page Object Model (POM)**. Los tests son archivos `*.spec.ts` que se ejecutan directamente con el runner de Playwright; no usan Cucumber ni Gherkin. El plan y la documentación de QA están en `../qa/`.
 
 ## Estructura
